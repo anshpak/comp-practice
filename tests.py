@@ -39,6 +39,7 @@ class Prime_Test:
                 return False
         return True
     
+    @staticmethod
     def __fast_power(a, d, m):
         b = 1
         while d > 0:
@@ -48,6 +49,7 @@ class Prime_Test:
             d = d >> 1
         return b
     
+    @staticmethod
     def __gcd(a, b):
         while b:
             a, b = b, a % b
@@ -66,6 +68,7 @@ class Prime_Test:
                 return False
         return True
 
+    @staticmethod
     def __st(n):
         s = 0
         t = n - 1
@@ -74,6 +77,7 @@ class Prime_Test:
             t = t // 2
         return s, t
 
+    @staticmethod
     def __witness_q(a, n, s = 0, t = 0):
         if n % 2 == 0:
             return False
@@ -82,11 +86,11 @@ class Prime_Test:
         if Prime_Test.__gcd(a,n) > 1:
             return False
         b = pow(a,t,n)
-        if b == 1 or b == n-1:
-            return True
-        for _ in range(1,s):
+        if b == 1 or b == n - 1:
+                       return True
+        for _ in range(1, s):
             b = b**2 % n
-            if b == n-1:
+            if b == n - 1:
                 return True
         return False
 
@@ -95,9 +99,9 @@ class Prime_Test:
         from random import randint
         if n % 2 == 0:
             return False
-        s,t = Prime_Test.__st(n)
+        s, t = Prime_Test.__st(n)
         for _ in range(k):
-            a = randint(2,n-1)
+            a = randint(2, n-1)
             if not Prime_Test.__witness_q(a, n, s, t):
                 return False
         return True
