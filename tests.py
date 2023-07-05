@@ -1,8 +1,9 @@
 import random
 import math
 import sympy
+from math import sqrt
 
-class Prime_Test:
+class PrimeTest:
     @staticmethod
     def trial_division(n):
         d = 2
@@ -59,9 +60,9 @@ class Prime_Test:
     def solovay_strassen(n, k):
         for i in range(1, k+1):
             a = random.randint(2,n-1)
-            if Prime_Test.__gcd(a,n) > 1:
+            if PrimeTest.__gcd(a,n) > 1:
                 return False
-            j = Prime_Test.__fast_power(a, (n - 1) // 2, n)
+            j = PrimeTest.__fast_power(a, (n - 1) // 2, n)
             jacobi_symb = sympy.jacobi_symbol(a, n) % n
             if jacobi_symb != j:
                 print(jacobi_symb)
@@ -82,8 +83,8 @@ class Prime_Test:
         if n % 2 == 0:
             return False
         if s == 0:
-            s, t = Prime_Test.__st(n)    
-        if Prime_Test.__gcd(a,n) > 1:
+            s, t = PrimeTest.__st(n)    
+        if PrimeTest.__gcd(a,n) > 1:
             return False
         b = pow(a,t,n)
         if b == 1 or b == n - 1:
@@ -99,9 +100,9 @@ class Prime_Test:
         from random import randint
         if n % 2 == 0:
             return False
-        s, t = Prime_Test.__st(n)
+        s, t = PrimeTest.__st(n)
         for _ in range(k):
             a = randint(2, n-1)
-            if not Prime_Test.__witness_q(a, n, s, t):
+            if not PrimeTest.__witness_q(a, n, s, t):
                 return False
         return True
