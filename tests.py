@@ -7,7 +7,9 @@ from jacobi import *
 
 class PrimeTest:
     @staticmethod
-    def __trial_division(n):
+    def trial_divisions(n):
+        if n == 1:
+            return False
         d = 2
         while d <= n ** 0.5:
             if n % d == 0:
@@ -99,6 +101,10 @@ class PrimeTest:
 
     @staticmethod
     def miller_rabin(n, k = 10):
+        if n == 1:
+            return False
+        if n == 2:
+            return True
         from random import randint
         if n % 2 == 0:
             return False
@@ -137,7 +143,7 @@ class PrimeTest:
         s = 1
         q_list = []
         for q in range(2, t+2):
-            if t%(q-1) == 0 and PrimeTest.__trial_division(q):
+            if t%(q-1) == 0 and PrimeTest.trial_divisions(q):
                 s *= q ** (1+PrimeTest.__v(q,t))
                 q_list.append(q)
         return 2*s, q_list
@@ -372,7 +378,7 @@ class PrimeTest:
                 found = False
                 while count < 30:
                     q = p*i+1
-                    if N%q != 0 and PrimeTest.__trial_division(q) and (q not in q_list):
+                    if N%q != 0 and PrimeTest.trial_divisions(q) and (q not in q_list):
                         count += 1
                         k = PrimeTest.__v(p, q-1)
                         # Step 4
