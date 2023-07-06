@@ -62,6 +62,8 @@ class PrimeTest:
 
     @staticmethod
     def solovay_strassen(n, k):
+        if n == 2:
+            return True
         for i in range(1, k+1):
             a = random.randint(2,n-1)
             if PrimeTest.__gcd(a,n) > 1:
