@@ -4,6 +4,8 @@ import sympy
 from math import sqrt
 import copy
 from jacobi import *
+import os
+import psutil
 
 class PrimeTest:
     @staticmethod
@@ -401,3 +403,259 @@ class PrimeTest:
             if r!=1 and r!= N and N % r == 0:
                 return False
         return True
+
+    @staticmethod
+    def __bisect(n):
+        n >>= 1
+
+    @staticmethod
+    def __redouble(n):
+        n <<= 1
+
+    @staticmethod
+    def __perfect_square(n):
+        sq = math.ceil(math.sqrt(n))
+        return sq*sq == n
+
+    @staticmethod
+    def __sq_root(n):
+        return int(math.floor(math.sqrt(n)))
+
+    @staticmethod
+    def __bits_in_number(n):
+        if n == 0:
+            return 1
+        result = 0
+        while n:
+            n >>= 1
+            result += 1
+        return result
+
+    @staticmethod
+    def __test_bit(n, k):
+        return (n & (1 << k)) != 0
+
+    @staticmethod
+    def __mulmod(a, b, n):
+        if isinstance(a, int):
+            a = a % n
+            b = b % n
+            res = 0
+            while b > 0:
+                if b & 1:
+                    res += a
+                    if res >= n:
+                        res -= n
+                a = a << 1
+                if a >= n:
+                    a -= n
+                b = b >> 1
+            return res
+        else:
+            a = a % n
+            b = b % n
+            res = 0
+            while b > 0:
+                if b & 1:
+                    res += a
+                    if res >= n:
+                        res -= n
+                a = (a + a) % n
+                b = b >> 1
+            return res
+
+    @staticmethod
+    def __powmod(a, k, n):
+        a = a % n
+        res = 1
+        while k > 0:
+            if k & 1:
+                res = PrimeTest.__mulmod(res, a, n)
+            a = PrimeTest.__mulmod(a, a, n)
+            k = k >> 1
+        return res
+
+    @staticmethod
+    def __transform_num(n, p, q):
+        p_res = 0
+        while (n%2 == 0):
+            p_res += 1
+            n >>= 1
+        p = p_res
+        q = n
+
+    @staticmethod
+    def __get_primes(b):
+        primes = []
+        counted_b = 0
+        if counted_b >= b:
+            return primes
+        else:
+            if counted_b == 0:
+                primes.append(2)
+                counted_b = 2
+            first = 3 if counted_b == 2 else primes[-1] + 2
+            for cur in range(first, b + 1, 2):
+                cur_is_prime = True
+                for div in primes:
+                    if div * div > cur:
+                        break
+                    if cur % div == 0:
+                        cur_is_prime = False
+                        break
+                if cur_is_prime:
+                    primes.append(cur)
+            counted_b = b
+            return primes
+
+    @staticmethod
+    def __prime_div_trivial(n, m):
+        if n == 2 or n == 3:
+            return 1
+        if n < 2:
+            return 0
+        if n%2 == 0:
+            return 2
+        primes = PrimeTest.__get_primes(m)
+        for div in primes:
+            if div * div > n:
+                break
+            elif n % div == 0:
+                return div
+        if n < m * m:
+            return 1
+        return 0
+
+    @staticmethod
+    def __miller_rabin(n, b):
+        if n == 2:
+            return True
+        if n < 2 or n%2 == 0:
+            return False
+
+        if b < 2:
+            b = 2
+        while PrimeTest.__gcd(n,b) != 1:
+            if n > g:
+                return False
+            b = b + 1
+
+        n_1 = n - 1
+        p, q = 0, 0
+        PrimeTest.__transform_num(n_1, p, q)
+
+        rem = PrimeTest.__powmod(b, q, n)
+        if rem == 1 or rem == n_1:
+            return True
+
+        for i in range(p):
+            PrimeTest.__mulmod(rem,rem,n)
+            if rem == n_1:
+                return True
+
+        return False
+
+    @staticmethod
+    def __lucas_selfridge(n, unused):
+        if n == 2:
+            return True
+        if n < 2 or n % 2 == 0:
+            return False
+
+        if PrimeTest.__perfect_square(n):
+            return False
+
+        d_abs = 5
+        d_sign = 1
+        while True:
+            dd = d_abs * d_sign
+            g = PrimeTest.__gcd(n, d_abs)
+            if 1 < g < n:
+                return False
+            if jacobi_symbol(dd, n) == -1:
+                break
+            d_sign = -d_sign
+            d_abs += 2
+
+        p = 1
+        q = (p*p - dd) // 4
+
+        n_1 = n + 1
+        s, d = 0,0
+        PrimeTest.__transform_num(n_1, s, d)
+
+        u = 1
+        v = p
+        u2m = 1
+        v2m = p
+        qm = q
+        qm2 = q*2
+        qkd = q
+        for bit in range(1, PrimeTest.__bits_in_number(d)):
+            u2m, v2m = PrimeTest.__mulmod(u2m,v2m, n), PrimeTest.__mulmod(v2m,v2m,n)
+            while v2m < qm2:
+                v2m += n
+            v2m -= qm2
+            qm = PrimeTest.__mulmod(qm,qm,n)
+            qm2 = qm
+            PrimeTest.__redouble(qm2)
+            if PrimeTest.__test_bit(d, bit):
+                t1 = u2m
+                PrimeTest.__mulmod(t1,v,n)
+                t2 = v2m
+                PrimeTest.__mulmod(t2,u,n)
+                t3 = v2m
+                PrimeTest.__mulmod(t3,v,n)
+                t4 = u2m 
+                PrimeTest.__mulmod(t4,u,n)
+                PrimeTest.__mulmod(t4,dd,n)
+
+                u = t1 + t2
+                v = t3 + t4 
+                if u % 2 != 0:
+                    u += n
+                u //= 2
+                u = u % n
+
+                if v % 2 != 0:
+                    v += n
+                v //= 2
+                v = v % n
+
+                PrimeTest.__mulmod(qkd, qm, n)
+        if u == 0 or v == 0:
+            return True
+
+        qkd2 = qkd
+        PrimeTest.__redouble(qkd2)
+        for r in range(1, s):
+            PrimeTest.__mulmod(v,v,n)
+            v -= qkd2
+
+            if v < 0:
+                v += n
+
+            if v < 0:
+                v += n
+            if v >= n:
+                v -= n
+            if v >= n:
+                v -= n
+            if v == 0:
+                return True
+            if r < s-1:
+                PrimeTest.__mulmod(qkd,qkd, n)
+                qkd2 = qkd
+                PrimeTest.__redouble(qkd2)
+        return False
+
+    @staticmethod
+    def baillie_pomerance_selfridge_wagstaff(n):
+        div = PrimeTest.__prime_div_trivial(n, 1000)
+        if div == 1:
+            return True
+        if div > 1:
+            return False
+        if not PrimeTest.__miller_rabin(n, 2):
+            return False
+        return PrimeTest.__lucas_selfridge(n, 0)
