@@ -73,7 +73,6 @@ class PrimeTest:
             j = PrimeTest.__fast_power(a, (n - 1) // 2, n)
             jacobi_symb = sympy.jacobi_symbol(a, n) % n
             if jacobi_symb != j:
-                print(jacobi_symb)
                 return False
         return True
 

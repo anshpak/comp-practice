@@ -16,7 +16,6 @@ class Numbers:
     def prot(p):
         l = p - 1
         k, n = Numbers.factorize(l)
-        print(n,k)
         if k % 2 != 0 and k < 2**n:
             return True
         else:
@@ -26,7 +25,6 @@ class Numbers:
     def is_mills_number(n):
         A = 1.3063778838630806904686144926
         for i in range(1,8):
-            print(round(A**(3**i)))
             if round(A**(3**i)) == n:
                 return True
         return False
@@ -40,7 +38,7 @@ class Numbers:
                 return False
             n >>= 1
             p += 1
-        if not PrimeTest.trial_division(p):
+        if not PrimeTest.trial_divisions(p):
                 return False
         return True
 
